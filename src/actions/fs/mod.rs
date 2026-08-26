@@ -1,7 +1,7 @@
-use crate::{lexer::Lexer, source_code::SourceCode};
+use crate::types::source_code::SourceCode;
 
 #[derive(Debug)]
-pub(crate) enum SourceFileReaderErr {}
+pub(crate) enum FileReaderErr {}
 
 pub(crate) struct SourceFileReader {
     source_code: String,
@@ -14,7 +14,7 @@ impl SourceFileReader {
         }
     }
 
-    pub(crate) fn read(self) -> Result<SourceCode, SourceFileReaderErr> {
+    pub(crate) fn read(self) -> Result<SourceCode, FileReaderErr> {
         Ok(SourceCode::new(self.source_code))
     }
 }

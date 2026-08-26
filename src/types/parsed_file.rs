@@ -1,7 +1,3 @@
-
-#[derive(Debug)]
-pub(crate) enum ParserErr {}
-
 pub(crate) enum FileItem {}
 
 #[must_use]

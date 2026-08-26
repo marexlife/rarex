@@ -1,11 +1,11 @@
-use crate::actions::fs::{SourceFileReader, SourceFileReaderErr};
+use crate::actions::fs::{FileReaderErr, SourceFileReader};
 use crate::actions::lexer::{self, LexerErr};
-use crate::actions::parser::{self, AstNode, ParserErr};
+use crate::actions::parser::{self, ParserErr};
 use crate::types::source_code::SourceCode;
 
 #[derive(Debug)]
 pub(crate) enum CompilerErr {
-    SourceFileReaderErr(SourceFileReaderErr),
+    FileReaderErr(FileReaderErr),
     LexerErr(LexerErr),
     ParserErr(ParserErr),
 }
@@ -27,7 +27,7 @@ impl App {
         source_codes.into_iter().map(Self::compile)
     }
 
-    fn read_file() -> Result<SourceCode, SourceFileReaderErr> {
+    fn read_file() -> Result<SourceCode, FileReaderErr> {
         let source_file_reader = SourceFileReader::new();
 
         source_file_reader.read()
