@@ -1,13 +1,10 @@
+use crate::actions::app::App;
 #[forbid(unsafe_code, clippy::unwrap_used, clippy::expect_used)]
-use app::{CompilerErr, compile};
+use crate::actions::app::CompilerErr;
 
-mod app;
-mod fs;
-mod lexer;
-mod source_code;
-mod tok;
-mod tok_stream;
+mod actions;
+mod types;
 
 fn main() -> Result<(), CompilerErr> {
-    compile()
+    App::compile()
 }

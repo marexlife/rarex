@@ -1,7 +1,8 @@
+use crate::source_code::SourceCode;
 use crate::tok::Tok;
 use crate::tok::TokKind;
 use crate::tok::TokPos;
-use crate::tok_stream::TokStream;
+use crate::tok_stream::TokenStream;
 
 #[must_use]
 #[derive(Debug)]
@@ -11,14 +12,14 @@ pub(crate) enum LexerErr {
 
 #[must_use]
 pub(crate) struct Lexer {
-    source_code: String,
+    source_code: SourceCode,
     last_word: String,
     toks: Vec<Tok>,
     pos: TokPos,
 }
 
 impl Lexer {
-    pub(crate) fn new(source_code: String) -> Self {
+    pub(crate) fn new(source_code: SourceCode) -> Self {
         Self {
             source_code,
             last_word: String::new(),
@@ -27,7 +28,7 @@ impl Lexer {
         }
     }
 
-    pub(crate) fn lex(mut self) -> Result<TokStream, LexerErr> {
+    pub(crate) fn lex(mut self) -> Result<TokenStream, LexerErr> {
         for c in self.source_code.chars() {
             match c {
                 ' ' | '\n' => {
@@ -44,6 +45,6 @@ impl Lexer {
             }
         }
 
-        Ok(TokStream::new(self.toks))
+        Ok(TokenStream::new(self.toks))
     }
 }

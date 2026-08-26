@@ -1,12 +1,12 @@
-use crate::tok::Tok;
+use crate::types::tok::Tok;
 
 #[must_use]
-pub(crate) struct TokStream {
+pub(crate) struct TokenStream {
     toks: Vec<Tok>,
     progress: usize,
 }
 
-impl TokStream {
+impl TokenStream {
     pub(crate) fn new(toks: Vec<Tok>) -> Self {
         Self { toks, progress: 0 }
     }

@@ -1,4 +1,4 @@
-use crate::lexer::Lexer;
+use crate::{lexer::Lexer, source_code::SourceCode};
 
 #[derive(Debug)]
 pub(crate) enum SourceFileReaderErr {}
@@ -14,7 +14,7 @@ impl SourceFileReader {
         }
     }
 
-    pub(crate) fn fill(self) -> Result<Lexer, SourceFileReaderErr> {
-        Ok(Lexer::new(self.source_code))
+    pub(crate) fn read(self) -> Result<SourceCode, SourceFileReaderErr> {
+        Ok(SourceCode::new(self.source_code))
     }
 }
