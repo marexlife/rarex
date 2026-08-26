@@ -1,5 +1,5 @@
-use crate::types::tok_stream::TokStream;
-use crate::types::tok_stream::TokStream;
+use crate::types::token_stream::TokStream;
+use crate::types::parsed_file::ParsedFile;
 
 #[derive(Debug)]
 pub(crate) enum ParserErr {}
