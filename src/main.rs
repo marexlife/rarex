@@ -1,10 +1,13 @@
+#[forbid(unsafe_code, clippy::unwrap_used, clippy::expect_used)]
+use crate::source_file::SourceFile;
+
 mod lex;
+mod parse;
+mod source_file;
+mod tok;
 
-fn main() {
-    let source_code = String::new();
-    let tokens = lex::Lexer::new(source_code).lex();
+fn main() -> anyhow::Result<()> {
+    SourceFile::new().fill();
 
-    for token in tokens {
-        
-    }
+    Ok(())
 }

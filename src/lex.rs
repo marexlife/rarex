@@ -1,40 +1,48 @@
-pub(crate) enum Tok {
-    Var,
-    Ident(String),
-}
-pub(crate) struct Lexer {
-    source_code: String,
-    last_word: String,
-    tokens: Vec<Tok>,
+use crate::parse::TokStream;
+use crate::tok::Tok;
+use crate::tok::TokKind;
+use crate::tok::TokPos;
+
+#[must_use]
+pub(crate) enum LexError {
+    SourceCodeEmpty,
 }
 
-impl Lexer {
+#[must_use]
+pub(crate) struct SourceCode {
+    source_code: String,
+    last_word: String,
+    tokens: TokStream,
+    pos: TokPos,
+}
+
+impl SourceCode {
     pub(crate) fn new(source_code: String) -> Self {
         Self {
             source_code,
             last_word: String::new(),
-            tokens: vec![],
+            tokens: TokStream::new(),
+            pos: TokPos::new(),
         }
     }
 
-    pub(crate) fn lex(mut self) -> Vec<Tok> {
+    pub(crate) fn lex(mut self) -> Result<TokStream, LexError> {
         for c in self.source_code.chars() {
             match c {
-                ' ' => {
-                    let new_token = match self.last_word.as_str() {
-                        "var" => Tok::Var,
-                        ident => Tok::Ident(ident.to_string()),
+                ' ' | '\n' => {
+                    let new_token_kind = match self.last_word.as_str() {
+                        "var" => TokKind::Var,
+                        ident => TokKind::Ident(ident.to_string()),
                     };
 
-                    self.tokens.push(new_token);
+                    self.tokens.push(Tok::new(new_token_kind, self.pos));
                     self.last_word.clear();
                 }
-                _ => {
-                    self.last_word.push(c);
-                }
+                ';' => {}
+                _ => self.last_word.push(c),
             }
         }
 
-        self.tokens
+        Ok(self.tokens)
     }
 }
