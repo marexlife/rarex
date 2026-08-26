@@ -1,13 +1,13 @@
 #[forbid(unsafe_code, clippy::unwrap_used, clippy::expect_used)]
-use crate::source_file::SourceFile;
+use app::{CompilerErr, compile};
 
-mod lex;
-mod parse;
-mod source_file;
+mod app;
+mod fs;
+mod lexer;
+mod source_code;
 mod tok;
+mod tok_stream;
 
-fn main() -> anyhow::Result<()> {
-    SourceFile::new().fill();
-
-    Ok(())
+fn main() -> Result<(), CompilerErr> {
+    compile()
 }
