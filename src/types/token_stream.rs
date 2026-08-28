@@ -21,11 +21,20 @@ impl TokenStream {
             progress: 0,
         }
     }
-    pub(crate) fn poses(&self) -> TokenPos {
+
+    pub(crate) fn poses(&self) -> &Vec<TokenPos> {
+        &self.token_poses
+    }
+
+    pub(crate) fn kinds(&self) -> &Vec<TokenKind> {
+        &self.token_kinds
+    }
+
+    pub(crate) fn pos(&self) -> TokenPos {
         self.token_poses[self.progress]
     }
 
-    pub(crate) fn kinds(&self) -> &TokenKind {
+    pub(crate) fn kind(&self) -> &TokenKind {
         &self.token_kinds[self.progress]
     }
 

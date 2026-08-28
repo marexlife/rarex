@@ -18,21 +18,13 @@ pub(crate) fn test_lexer() {
 
     let result = Lexer::new().lex(source_code);
 
-    let toks = vec![
+    let tok_kinds = vec![
         TokenKind::Var,
         TokenKind::Ident("x".to_string()),
     ];
 
     match result {
-        Ok(v) => {
-            for e in v.toks() {
-                for f in &toks {
-                    assert_eq!(e.kind(), f)
-                }
-            }
-        }
-        Err(e) => {
-            assert!(false, "{e:?}");
-        }
+        Ok(v) => assert_eq!(*v.kinds(), tok_kinds),
+        Err(e) => panic!("{e:?}"),
     }
 }
