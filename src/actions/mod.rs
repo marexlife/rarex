@@ -1,2 +1,1 @@
-pub(crate) mod app;
-mod lexer;
+pub(crate) mod lexer;

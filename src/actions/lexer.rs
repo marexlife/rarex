@@ -1,5 +1,7 @@
 use crate::types::source_code::SourceCode;
-use crate::types::tok::{Tok, TokKind, TokPos};
+use crate::types::token::{
+    Token, kind::TokenKind, pos::TokenPos,
+};
 use crate::types::token_stream::TokenStream;
 
 #[must_use]
@@ -17,8 +19,8 @@ enum LastCharKind {
 #[must_use]
 pub(crate) struct Lexer {
     last_word: String,
-    toks: Vec<Tok>,
-    pos: TokPos,
+    toks: Vec<Token>,
+    pos: TokenPos,
     last_char_kind: Option<LastCharKind>,
 }
 
@@ -27,7 +29,7 @@ impl Lexer {
         Self {
             last_word: String::new(),
             toks: vec![],
-            pos: TokPos::new(),
+            pos: TokenPos::new(),
             last_char_kind: None,
         }
     }
@@ -47,12 +49,18 @@ impl Lexer {
             return Err(LexerErr::SourceCodeEmpty);
         }
 
+        self.pos.advance_column();
+
         for source_code_char in source_code.chars() {
             self.last_char_kind =
                 Some(LastCharKind::WasNotDefault);
 
             match source_code_char {
-                ' ' | '\n' => self.flush_last(),
+                '\n' => {
+                    self.pos.advance_line();
+                    self.flush_last();
+                }
+                ' ' => self.flush_last(),
                 ';' => self.flush_last_and_append(
                     source_code_char,
                 ),
@@ -61,8 +69,6 @@ impl Lexer {
                 ),
             }
         }
-
-        self.last_char_kind = None;
 
         Ok(TokenStream::new(self.toks))
     }
@@ -75,8 +81,8 @@ impl Lexer {
     }
 
     fn flush_last(&mut self) {
-        self.toks.push(Tok::new(
-            TokKind::new(&self.last_word.as_str()),
+        self.toks.push(Token::new(
+            TokenKind::new(&self.last_word.as_str()),
             self.pos,
         ));
         self.last_word.clear();
@@ -93,8 +99,8 @@ impl Lexer {
         let char_to_append_string =
             char_to_append.to_string();
 
-        self.toks.push(Tok::new(
-            TokKind::new(&char_to_append_string),
+        self.toks.push(Token::new(
+            TokenKind::new(&char_to_append_string),
             self.pos,
         ));
     }
