@@ -1,6 +1,6 @@
 use crate::types::source_code::SourceCode;
 use crate::types::token::{
-    Token, kind::TokenKind, pos::TokenPos,
+    kind::TokenKind, pos::TokenPos,
 };
 use crate::types::token_stream::TokenStream;
 
@@ -19,18 +19,22 @@ enum LastCharKind {
 #[must_use]
 pub(crate) struct Lexer {
     last_word: String,
-    toks: Vec<Token>,
+    token_kinds: Vec<TokenKind>,
+    token_poses: Vec<TokenPos>,
     pos: TokenPos,
     last_char_kind: Option<LastCharKind>,
+    progress: usize
 }
 
 impl Lexer {
     pub(crate) fn new() -> Self {
         Self {
             last_word: String::new(),
-            toks: vec![],
+            token_kinds: vec![],
+            token_poses: vec![],
             pos: TokenPos::new(),
             last_char_kind: None,
+            progress: 0
         }
     }
 
@@ -70,7 +74,10 @@ impl Lexer {
             }
         }
 
-        Ok(TokenStream::new(self.toks))
+        Ok(TokenStream::new(
+            self.token_kinds,
+            self.token_poses,
+        ))
     }
 
     fn handle_default_case(&mut self, c: char) {
@@ -80,11 +87,18 @@ impl Lexer {
         self.last_word.push(c)
     }
 
-    fn flush_last(&mut self) {
-        self.toks.push(Token::new(
-            TokenKind::new(&self.last_word.as_str()),
-            self.pos,
-        ));
+    fn push(
+        &mut self,
+        token_kind: TokenKind
+    ) {
+        self.token_kinds.push(token_kind);
+        self.token_poses.push(self.token_poses[self.progress]);
+    }
+
+    fn flush_last(token_kinds: Vec<TokenKind>) {
+        self.push(
+            token_kinds[self.progress],
+        );
         self.last_word.clear();
     }
 
@@ -99,9 +113,9 @@ impl Lexer {
         let char_to_append_string =
             char_to_append.to_string();
 
-        self.toks.push(Token::new(
+        self.push(
             TokenKind::new(&char_to_append_string),
             self.pos,
-        ));
+        );
     }
 }

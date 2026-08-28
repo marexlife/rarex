@@ -1,8 +1,7 @@
 use crate::{
     actions::lexer::Lexer,
     types::{
-        source_code::SourceCode,
-        token::{Token, pos::TokenPos},
+        source_code::SourceCode, token::pos::TokenPos,
         token_stream::TokenStream,
     },
 };
