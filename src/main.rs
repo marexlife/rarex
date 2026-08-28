@@ -1,9 +1,12 @@
-#[forbid(unsafe_code, clippy::unwrap_used, clippy::expect_used)]
+use std::path::PathBuf;
+
 use crate::actions::app;
 
 mod actions;
 mod types;
 
+use clap::Parser;
+
 fn main() {
-    app::run()
+    app::run();
 }

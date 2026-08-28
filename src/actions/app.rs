@@ -1,6 +1,7 @@
 use std::io;
+use std::process::exit;
+use std::string::FromUtf8Error;
 
-use crate::actions::fs::{FileReaderErr, SourceFileReader};
 use crate::actions::lexer::{self, LexerErr};
 use crate::actions::parser::{self, ParserErr};
 use crate::types::parsed_file::ParsedCode;
@@ -8,98 +9,55 @@ use crate::types::source_code::SourceCode;
 use crate::types::token_stream::TokenStream;
 
 #[derive(Debug)]
-pub(crate) enum AppErrKind {
-    FileReaderErr(FileReaderErr),
-    UserInputFailed(io::Error),
+pub(crate) enum RarexErrKind {
+    FileError(io::Error),
+    Utf8Error(FromUtf8Error),
     LexerErr(LexerErr),
-    ParserErr(ParserErr),
-    WriteErr(io::Error),
 }
 
-#[must_use]
-enum AppModeKind {
-    ShellMode,
-    FileMode(Vec<SourceCode>),
-}
+pub(crate) fn run() -> Result<(), RarexErrKind> {
+    let args: Vec<String> = std::env::args().collect();
 
-pub(crate) fn run() {}
+    if args.len() < 2 {
+        eprintln!("Not enough arguments");
 
-fn run_shell_mode() {
-    loop {
-        run_shell_mode_iter();
+        exit(-1);
     }
-}
 
-fn take_user_input() -> Result<String, AppErrKind> {
-    let input_stream = std::io::stdin();
-    let mut input = String::new();
+    let mut source_codes = vec![];
 
-    match input_stream.read_line(&mut input) {
-        Ok(_) => Ok(input),
-        Err(e) => Err(AppErrKind::UserInputFailed(e)),
+    for e in args {
+        let contents = match std::fs::read(e) {
+            Ok(v) => v,
+            Err(e) => return Err(RarexErrKind::FileError(e)),
+        };
+
+        let contents = match String::from_utf8(contents) {
+            Ok(v) => v,
+            Err(e) => return Err(RarexErrKind::Utf8Error(e)),
+        };
+
+        source_codes.push(SourceCode::new(contents));
     }
-}
-fn take_user_code() -> Result<SourceCode, AppErrKind> {
-    let user_input = take_user_input()?;
 
-    Ok(SourceCode::new(user_input))
-}
+    compile_files(source_codes);
 
-fn run_shell_mode_iter() -> Result<(), AppErrKind> {
-    let user_code = take_user_code()?;
-
-    interpret(user_code)
+    Ok(())
 }
 
-fn compile_files(source_codes: Vec<SourceCode>) -> Vec<Result<(), AppErrKind>> {
+fn compile_files(source_codes: Vec<SourceCode>) -> Vec<Result<(), RarexErrKind>> {
     source_codes.into_iter().map(compile).collect()
 }
 
-fn interpret(source_code: SourceCode) -> Result<(), AppErrKind> {
-    let parsed_code = source_to_parsed(source_code)?;
+fn compile(source_code: SourceCode) -> Result<(), RarexErrKind> {
+    let _ = lex(source_code)?;
 
-    execute(parsed_code)
-}
-
-fn compile(source_code: SourceCode) -> Result<(), AppErrKind> {
-    let parsed_code = source_to_parsed(source_code)?;
-
-    write(parsed_code)
-}
-
-fn source_to_parsed(source_code: SourceCode) -> Result<ParsedCode, AppErrKind> {
-    let token_stream = lex(source_code)?;
-
-    parse(token_stream)
-}
-
-fn write(parsed_code: ParsedCode) -> Result<(), AppErrKind> {
     Ok(())
 }
 
-fn execute(parsed_code: ParsedCode) -> Result<(), AppErrKind> {
-    Ok(())
-}
-
-fn read_file() -> Result<SourceCode, AppErrKind> {
-    let source_code = SourceFileReader::new().read();
-
-    match source_code {
-        Ok(v) => Ok(v),
-        Err(e) => Err(AppErrKind::FileReaderErr(e)),
-    }
-}
-
-fn lex(source_code: SourceCode) -> Result<TokenStream, AppErrKind> {
+fn lex(source_code: SourceCode) -> Result<TokenStream, RarexErrKind> {
     match lexer::Lexer::new().lex(source_code) {
         Ok(v) => Ok(v),
-        Err(e) => return Err(AppErrKind::LexerErr(e)),
-    }
-}
-
-fn parse(token_stream: TokenStream) -> Result<ParsedCode, AppErrKind> {
-    match parser::Parser::parse(token_stream) {
-        Ok(v) => Ok(v),
-        Err(e) => Err(AppErrKind::ParserErr(e)),
+        Err(e) => return Err(RarexErrKind::LexerErr(e)),
     }
 }
