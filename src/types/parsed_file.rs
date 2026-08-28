@@ -1,11 +1,11 @@
 pub(crate) enum FileItem {}
 
 #[must_use]
-pub(crate) struct ParsedFile {
+pub(crate) struct ParsedCode {
     file_items: Vec<FileItem>,
 }
 
-impl ParsedFile {
+impl ParsedCode {
     pub fn new() -> Self {
         Self { file_items: vec![] }
     }
