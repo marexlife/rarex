@@ -3,6 +3,15 @@ pub(crate) enum TokKind {
     Ident(String),
 }
 
+impl TokKind {
+    pub(crate) fn new(input: &str) -> Self {
+        match input {
+            "var" => TokKind::Var,
+            _ => TokKind::Ident(input.to_string()),
+        }
+    }
+}
+
 impl std::fmt::Display for TokKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let display_name = match *self {

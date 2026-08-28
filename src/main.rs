@@ -1,10 +1,14 @@
 use std::path::PathBuf;
 
-use crate::actions::app;
+use crate::actions::app::{self, RarexErrKind};
 
 mod actions;
 mod types;
 
 fn main() {
-    app::run();
+    let result = app::run();
+
+    if let Err(e) = result {
+        eprintln!("{e:?}")
+    }
 }
