@@ -1,4 +1,6 @@
-use std::{error::Error, fs::File, io::Read};
+use std::{
+    error::Error, fs::File, io::Read, process::exit,
+};
 
 use crate::{
     actions::lex, types::source_code::SourceCode,
@@ -11,6 +13,12 @@ mod types;
 fn main() -> Result<(), Box<dyn Error>> {
     let args =
         std::env::args().collect::<Vec<String>>();
+
+    if args.len() == 0 {
+        eprintln!("no file provided");
+
+        exit(-1)
+    }
 
     for arg in args {
         let mut buf: Vec<u8> = vec![];
