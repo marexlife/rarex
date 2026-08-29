@@ -10,6 +10,7 @@ pub(crate) enum TokenKind {
     Var,
     StatementEnd,
     Colon,
+    Fun,
     Ident(String),
 }
 
@@ -17,13 +18,7 @@ impl TokenKind {
     pub(crate) fn from_str(input: &str) -> Self {
         match input {
             "var" => TokenKind::Var,
-            _ => TokenKind::Ident(input.to_string()),
-        }
-    }
-
-    pub(crate) fn from_string(input: String) -> Self {
-        match input.as_str() {
-            "var" => TokenKind::Var,
+            "fun" => TokenKind::Fun,
             _ => TokenKind::Ident(input.to_string()),
         }
     }

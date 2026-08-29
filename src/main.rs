@@ -1,9 +1,11 @@
-use std::{
-    error::Error, fs::File, io::Read, process::exit,
-};
-
-use crate::{
-    actions::lex, types::source_code::SourceCode,
+use {
+    crate::{
+        actions::lex, types::source_code::SourceCode,
+    },
+    std::{
+        error::Error, fs::File, io::Read,
+        process::exit,
+    },
 };
 
 mod actions;
