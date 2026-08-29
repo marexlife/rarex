@@ -40,36 +40,27 @@ pub(crate) fn lex(
             Some(LastCharKind::WasNotDefault);
 
         match source_code_char {
-            '\n' => {
-                token_pos.advance_line();
-
-                flush_last(
-                    &mut token_kinds,
-                    &mut token_poses,
-                    &mut last_word,
-                    token_pos,
-                );
-            }
+            '\n' => handle_new_line(
+                &mut token_kinds,
+                &mut token_poses,
+                &mut token_pos,
+                &mut last_word,
+            ),
             ' ' => flush_last(
                 &mut token_kinds,
                 &mut token_poses,
                 &mut last_word,
                 token_pos,
             ),
-            ';' => {
-                match flush_last_and_append(
+            ';' | ':' | ',' => {
+                handle_special_characters(
                     &mut token_kinds,
                     &mut token_poses,
+                    token_pos,
                     &mut last_word,
                     &last_char_kind,
                     source_code_char,
-                    token_pos,
-                ) {
-                    Ok(_) => {}
-                    Err(e) => return Err(
-                        LexerErr::ConversionErrKind(e),
-                    ),
-                }
+                )?
             }
             _ => handle_default_case(
                 &mut last_char_kind,
@@ -89,12 +80,40 @@ pub(crate) fn lex(
     Ok(TokenStream::new(token_kinds, token_poses))
 }
 
-fn is_flushable(
+fn handle_new_line(
+    token_kinds: &mut Vec<TokenKind>,
+    token_poses: &mut Vec<TokenPos>,
+    token_pos: &mut TokenPos,
+    last_word: &mut String,
+) {
+    token_pos.advance_line();
+
+    flush_last(
+        token_kinds,
+        token_poses,
+        last_word,
+        *token_pos,
+    );
+}
+
+fn handle_special_characters(
+    token_kinds: &mut Vec<TokenKind>,
+    token_poses: &mut Vec<TokenPos>,
+    token_pos: TokenPos,
+    last_word: &mut String,
     last_char_kind: &Option<LastCharKind>,
-) -> bool {
-    match last_char_kind {
-        Some(v) => *v == LastCharKind::WasDefault,
-        None => true,
+    source_code_char: char,
+) -> Result<(), LexerErr> {
+    match flush_last_and_append(
+        token_kinds,
+        token_poses,
+        last_word,
+        last_char_kind,
+        source_code_char,
+        token_pos,
+    ) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(LexerErr::ConversionErrKind(e)),
     }
 }
 
@@ -106,6 +125,15 @@ fn handle_default_case(
     *last_char_kind = Some(LastCharKind::WasDefault);
 
     last_word.push(current_char)
+}
+
+fn is_flushable(
+    last_char_kind: &Option<LastCharKind>,
+) -> bool {
+    match last_char_kind {
+        Some(v) => *v == LastCharKind::WasDefault,
+        None => true,
+    }
 }
 
 fn push(
