@@ -1,9 +1,11 @@
-use crate::types::source_code::SourceCode;
-use crate::types::token::kind::TokenConversionErrKind;
-use crate::types::token::{
-    kind::TokenKind, pos::TokenPos,
+use crate::types::{
+    source_code::SourceCode,
+    tokens::{
+        kind::{TokenConversionErrKind, TokenKind},
+        pos::TokenPos,
+        token_stream::TokenStream,
+    },
 };
-use crate::types::token_stream::TokenStream;
 
 #[must_use]
 #[derive(Debug)]

@@ -1,4 +1,4 @@
-use crate::types::token::{
+use crate::types::tokens::{
     kind::TokenKind, pos::TokenPos,
 };
 
@@ -22,6 +22,10 @@ impl TokenStream {
         }
     }
 
+    pub(crate) fn advance(&mut self) {
+        self.progress += 1;
+    }
+
     pub(crate) fn poses(&self) -> &Vec<TokenPos> {
         &self.token_poses
     }
@@ -39,7 +43,9 @@ impl TokenStream {
     }
 
     #[must_use]
-    fn is_at_end(&self) -> bool {
-        self.progress >= self.token_kinds.len()
+    pub(crate) fn is_at_end(&self) -> bool {
+        self.progress
+            >= self.token_kinds.len()
+                | self.token_poses.len()
     }
 }

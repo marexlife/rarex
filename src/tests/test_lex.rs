@@ -1,11 +1,11 @@
 use crate::actions::lex;
 
 use crate::types::{
-    source_code::SourceCode, token::pos::TokenPos,
-    token_stream::TokenStream,
+    source_code::SourceCode, tokens::pos::TokenPos,
+    tokens::token_stream::TokenStream,
 };
 
-use crate::types::token::kind::TokenKind;
+use crate::types::tokens::kind::TokenKind;
 
 #[test]
 pub(crate) fn test_lexer() {
